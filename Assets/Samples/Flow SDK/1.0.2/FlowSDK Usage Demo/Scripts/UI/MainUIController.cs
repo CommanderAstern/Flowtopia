@@ -34,9 +34,6 @@ namespace FlowSDKDemo
         public GameObject BlocksResultCollGuarantees;
 
         [Header("Collections")]
-        // Collection inputs
-        public GameObject CollectionsGetByIdInput;
-
         // Collection results
         public GameObject CollectionsResultId;
         public GameObject CollectionsResultTxIds;
@@ -233,15 +230,6 @@ namespace FlowSDKDemo
         /// <summary>
         /// Demonstrates calling the Collections.GetById() API. 
         /// </summary>
-        public async void CollectionsGetById()
-        {
-            string collectionId = CollectionsGetByIdInput.GetComponent<InputField>().text;
-
-            FlowCollection collection = await Collections.GetById(collectionId);
-
-            PrintCollectionsResult(collection);
-        }
-
         void PrintCollectionsResult(FlowCollection collection)
         {
             if (collection != null)

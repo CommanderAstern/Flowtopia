@@ -10,16 +10,28 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button quitButton;
     [SerializeField] private FlowController flowController;
     // Start is called before the first frame update
+    public enum ScreenName
+    {
+        GameScene,
+        Loading,
+        MainMenuScene,
+        ParkScene,
+    }
     private void Awake()
     {
         playButton.onClick.AddListener( () => {
-            flowController.SignInClicked();
+            LoadScene(ScreenName.Loading);
+            // flowController.SignInClicked();
         });
         quitButton.onClick.AddListener( () => {
             Application.Quit();
         });
     }
 
+    public void LoadScene(ScreenName scene)
+    {
+        SceneManager.LoadScene(scene.ToString());
+    }
     // Update is called once per frame
 
 }
