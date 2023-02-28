@@ -1,8 +1,9 @@
 ﻿ using UnityEngine;
- using Mirror;  
- using Cinemachine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
+using Cinemachine;
+using Mirror;
+using TMPro;
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
@@ -16,7 +17,8 @@ namespace StarterAssets
 #endif
     public class ThirdPersonController : NetworkBehaviour
     {
-        // [SerializeField] private GameObject playerCamera;
+        [SerializeField] private GameObject targetCameraFollow;
+        [SerializeField] private TMP_Text nameText;
         [Header("Player")]
         [Tooltip("Move speed of the character in m/s")]
         public float MoveSpeed = 2.0f;
@@ -109,6 +111,7 @@ namespace StarterAssets
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
 
+        private GameObject _followCamera;
         private const float _threshold = 0.01f;
 
         private bool _hasAnimator;
@@ -117,7 +120,7 @@ namespace StarterAssets
         {
             get
             {
-#if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM 
                 return _playerInput.currentControlScheme == "KeyboardMouse";
 #else
 				return false;
@@ -125,6 +128,12 @@ namespace StarterAssets
             }
         }
 
+        public override void OnStartLocalPlayer()
+        {
+            _followCamera = GameObject.FindGameObjectWithTag("FollowCamera");
+            _followCamera.GetComponent<CinemachineVirtualCamera>().Follow = targetCameraFollow.transform;
+            _controller = GetComponent<CharacterController>();
+        }
 
         private void Awake()
         {
@@ -137,18 +146,13 @@ namespace StarterAssets
 
         private void Start()
         {
-
-            if(isLocalPlayer)
-            {
-                // CinemachineVirtualCamera vcam = playerCamera.GetComponent<CinemachineVirtualCamera>();
-                // vcam.LookAt = this.gameObject.transform;
-            }
-            
             _cinemachineTargetYaw = CinemachineCameraTarget.transform.rotation.eulerAngles.y;
+
+
             _hasAnimator = TryGetComponent(out _animator);
             _controller = GetComponent<CharacterController>();
             _input = GetComponent<StarterAssetsInputs>();
-#if ENABLE_INPUT_SYSTEM 
+#if ENABLE_INPUT_SYSTEM
             _playerInput = GetComponent<PlayerInput>();
 #else
 			Debug.LogError( "Starter Assets package is missing dependencies. Please use Tools/Starter Assets/Reinstall Dependencies to fix it");
@@ -163,19 +167,33 @@ namespace StarterAssets
 
         private void Update()
         {
+            if(!isLocalPlayer)
+                return;
+
             _hasAnimator = TryGetComponent(out _animator);
 
             JumpAndGravity();
             GroundedCheck();
             Move();
-        }
+            Interact();
 
+        }
+        private void Interact()
+        {
+            Collider[] colliders = Physics.OverlapSphere(transform.position, 2f, LayerMask.GetMask("Player"));
+            foreach (var collider in colliders)
+            {
+                // if not the player
+                if (collider.gameObject == gameObject)
+                    continue;
+                // Debug.Log(collider.name);
+                // get the object
+                var player = collider.GetComponent<PlayerAccountInit>().playerName;
+                Debug.Log(player);
+            }
+        }
         private void LateUpdate()
         {
-            if(isLocalPlayer)
-            {
-                
-            }
             CameraRotation();
         }
 
@@ -384,22 +402,24 @@ namespace StarterAssets
 
         private void OnFootstep(AnimationEvent animationEvent)
         {
-            // if (animationEvent.animatorClipInfo.weight > 0.5f)
-            // {
-            //     if (FootstepAudioClips.Length > 0)
-            //     {
-            //         var index = Random.Range(0, FootstepAudioClips.Length);
-            //         AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
-            //     }
-            // }
+            if (animationEvent.animatorClipInfo.weight > 0.5f)
+            {
+                if (FootstepAudioClips.Length > 0)
+                {
+                    var index = Random.Range(0, FootstepAudioClips.Length);
+                    if (_controller == null) _controller = GetComponent<CharacterController>();
+                    AudioSource.PlayClipAtPoint(FootstepAudioClips[index], transform.TransformPoint(_controller.center), FootstepAudioVolume);
+                }
+            }
         }
 
         private void OnLand(AnimationEvent animationEvent)
         {
-            // if (animationEvent.animatorClipInfo.weight > 0.5f)
-            // {
-            //     AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
-            // }
+            if (animationEvent.animatorClipInfo.weight > 0.5f)
+            {
+                if (_controller == null) _controller = GetComponent<CharacterController>();
+                AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
+            }
         }
     }
 }
