@@ -102,6 +102,7 @@ namespace StarterAssets
         private int _animIDJump;
         private int _animIDFreeFall;
         private int _animIDMotionSpeed;
+        private bool canInteract = true;
 
 #if ENABLE_INPUT_SYSTEM 
         private PlayerInput _playerInput;
@@ -110,11 +111,15 @@ namespace StarterAssets
         private CharacterController _controller;
         private StarterAssetsInputs _input;
         private GameObject _mainCamera;
+        private Collider nearestCollider;
 
         private GameObject _followCamera;
         private const float _threshold = 0.01f;
 
         private bool _hasAnimator;
+
+        public GameObject popupUI;
+        public TMP_Text popupText;
 
         private bool IsCurrentDeviceMouse
         {
@@ -165,6 +170,42 @@ namespace StarterAssets
             _fallTimeoutDelta = FallTimeout;
         }
 
+
+
+        private void FixedUpdate()
+        {
+            // add another layer mask interactable
+            int playerMask = 1 << LayerMask.GetMask("Player");
+            int enemyMask = 1 << LayerMask.GetMask("Interactable");
+            int layerMask = playerMask | enemyMask;
+
+            Collider[] colliders = Physics.OverlapSphere(transform.position, 2f, LayerMask.GetMask("Player","Interactable"));
+
+
+            // find nearest player
+            nearestCollider = null;
+            float nearestDistance = float.MaxValue;
+
+            foreach (var collider in colliders)
+            {
+                // if not the player
+                if (collider.gameObject == gameObject)
+                    continue;
+                // var player = collider.GetComponent<PlayerAccountInit>().playerName;
+                // Debug.Log(player);
+                float distance = Vector3.Distance(transform.position, collider.transform.position);
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearestCollider = collider;
+                }
+            }
+            if (colliders.Length == 0)
+            {
+                nearestCollider = null;
+            }
+        }
+
         private void Update()
         {
             if(!isLocalPlayer)
@@ -176,27 +217,82 @@ namespace StarterAssets
             GroundedCheck();
             Move();
             Interact();
+        }
 
-        }
-        private void Interact()
-        {
-            Collider[] colliders = Physics.OverlapSphere(transform.position, 2f, LayerMask.GetMask("Player"));
-            foreach (var collider in colliders)
-            {
-                // if not the player
-                if (collider.gameObject == gameObject)
-                    continue;
-                // Debug.Log(collider.name);
-                // get the object
-                var player = collider.GetComponent<PlayerAccountInit>().playerName;
-                Debug.Log(player);
-            }
-        }
         private void LateUpdate()
         {
             CameraRotation();
         }
+        private void Interact()
+        {
+            // Debug.Log(nearestCollider);
+            if (nearestCollider != null)
+            {
+                float distance = Vector3.Distance(transform.position, nearestCollider.transform.position);
+                if (distance <= 2f)
+                {
+                    if (nearestCollider.CompareTag("Player"))
+                    {
+                        popupText.text = "Press E to interact with " + nearestCollider.gameObject.GetComponent<PlayerAccountInit>().playerName;
+                        popupUI.SetActive(true);
+                    }
+                    else
+                    {
+                        popupUI.SetActive(false);
+                    }
+                    if (nearestCollider.CompareTag("Interactable"))
+                    {
+                        
+                        GameObject overlayObject = nearestCollider.gameObject.transform.GetChild(1).gameObject;
+                        // show overlay
+                        overlayObject.SetActive(true);
+                        float cooldownTime = 0.5f;
+                        if(canInteract && _input.interact)
+                        {
+                            Debug.Log("Yes");
+                            canInteract = false;
+                            Invoke("ResetInteraction", cooldownTime);
 
+                        }
+                    }
+                    else
+                    {
+                        // get all objects with tag interactable
+                        GameObject[] interactables = GameObject.FindGameObjectsWithTag("Interactable");
+                        foreach (GameObject interactable in interactables)
+                        {
+                            GameObject overlayObject = interactable.transform.GetChild(1).gameObject;
+                            // hide overlay
+                            overlayObject.SetActive(false);
+                        }
+                    }
+                }
+                else
+                {
+                    DeactivateUninteracted();
+                }
+            }
+            else
+            {
+                DeactivateUninteracted();
+            }
+        }
+
+        private void DeactivateUninteracted()
+        {
+            popupUI.SetActive(false);
+            GameObject[] interactables = GameObject.FindGameObjectsWithTag("Interactable");
+            foreach (GameObject interactable in interactables)
+            {
+                GameObject overlayObject = interactable.transform.GetChild(1).gameObject;
+                // hide overlay
+                overlayObject.SetActive(false);
+            }
+        }
+        private void ResetInteraction()
+        {
+            canInteract = true; // Set the flag to true to allow interaction again.
+        }
         private void AssignAnimationIDs()
         {
             _animIDSpeed = Animator.StringToHash("Speed");
