@@ -8,21 +8,34 @@
 	"contracts": {
 		"FlowSDKSampleNFT": "./contracts/flow-sdk-sample-nft.cdc",
 		"FlowSDKSampleToken": "./contracts/flow-sdk-sample-token.cdc",
-		"FlowSDKSampleMarketplace": "./contracts/flow-sdk-sample-marketplace.cdc"
+		"FlowSDKSampleMarketplace": "./contracts/flow-sdk-sample-marketplace.cdc",
+		"BasicToken": "./contracts/deploy-fungible.cdc",
+		"ExampleToken": "./contracts/exampleToken.cdc",
+		"CreateLink": "./contracts/createLink.cdc",
+		"BasicInventory": "./contracts/basicInventory.cdc"
 	},
 	"networks": {
 		"emulator": "127.0.0.1:3569",
+
 		"mainnet": "access.mainnet.nodes.onflow.org:9000",
 		"testnet": "access.devnet.nodes.onflow.org:9000"
 	},
 	"accounts": {
+		"testnet-account-2": {
+			"address": "0x3d7331f6b02d4319",
+			"key": "a4b23081b7dfd94f6e7619d1b8275f7ea1f538e0e0ae148005aafa71400321fd"
+		},
 		"emulator-account": {
 			"address": "f8d6e0586b0a20c7",
 			"key": "2177ec179db199035ac3708fcc0d105edfc3e0d7bdaeee6602bcc29ccf80c1b8"
 		},
+		"testnet-account": {
+			"address": "0x91c7fd71eaa35f2f",
+			"key": "75cd4f363b16d52bfbb68fb88b4a147ff94bb68173190d0a936d8db02b834cdf"
+		},
 		"user1": {
-			"address": "01cf0e2f2f715450",
-			"key": "d841c856b1dc687b6186fcb55faebb1dd47166b5ddb71f940cbd9853bd50f335"
+			"address": "0x7aca06615b36070f",
+			"key": "0c60c8c86bcfc77ebff13cb4f8e05e71c689152d6d455a38f624a11671c5b208"
 		},
 		"user2": {
 			"address": "179b6b1cb6755e31",
@@ -36,6 +49,10 @@
 	"deployments": {
 		"emulator": {
 			"admin1": ["FlowSDKSampleNFT", "FlowSDKSampleToken", "FlowSDKSampleMarketplace"]
+		},
+		"testnet": {
+			"testnet-account": ["BasicInventory"]
 		}
 	}
 }
+

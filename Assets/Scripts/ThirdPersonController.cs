@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using Cinemachine;
 using Mirror;
 using TMPro;
+using UnityEngine.UIElements;
 #endif
 
 /* Note: animations are called via the controller for both the character and capsule using animator null checks
@@ -249,7 +250,8 @@ namespace StarterAssets
                         float cooldownTime = 0.5f;
                         if(canInteract && _input.interact)
                         {
-                            Debug.Log("Yes");
+                            PurchaceUIController uiController = GetComponent<PurchaceUIController>();
+                            uiController.UIStart();
                             canInteract = false;
                             Invoke("ResetInteraction", cooldownTime);
 
@@ -293,6 +295,7 @@ namespace StarterAssets
         {
             canInteract = true; // Set the flag to true to allow interaction again.
         }
+
         private void AssignAnimationIDs()
         {
             _animIDSpeed = Animator.StringToHash("Speed");
