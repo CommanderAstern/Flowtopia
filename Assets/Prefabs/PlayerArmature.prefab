@@ -1377,7 +1377,6 @@ MonoBehaviour:
   LockCameraPosition: 0
   popupUI: {fileID: 941848914512257938}
   popupText: {fileID: 7165841255015469011}
-  popup: {fileID: 0}
 --- !u!114 &5885216827943657505
 MonoBehaviour:
   m_ObjectHideFlags: 0
