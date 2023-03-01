@@ -121,7 +121,7 @@ namespace StarterAssets
 
         public GameObject popupUI;
         public TMP_Text popupText;
-
+        
         private bool IsCurrentDeviceMouse
         {
             get
@@ -178,7 +178,9 @@ namespace StarterAssets
             // add another layer mask interactable
             int playerMask = 1 << LayerMask.GetMask("Player");
             int enemyMask = 1 << LayerMask.GetMask("Interactable");
-            int layerMask = playerMask | enemyMask;
+            int hatMask = 1 << LayerMask.GetMask("Hatchange");
+
+            int layerMask = playerMask | enemyMask | hatMask;
 
             Collider[] colliders = Physics.OverlapSphere(transform.position, 2f, LayerMask.GetMask("Player","Interactable"));
 
@@ -236,6 +238,15 @@ namespace StarterAssets
                     {
                         popupText.text = "Press E to interact with " + nearestCollider.gameObject.GetComponent<PlayerAccountInit>().playerName;
                         popupUI.SetActive(true);
+                        float cooldownTime = 0.5f;
+                        if(canInteract && _input.interact)
+                        {
+                            PurchaceUIController uiController = GetComponent<PurchaceUIController>();
+                            
+                            canInteract = false;
+                            Invoke("ResetInteraction", cooldownTime);
+
+                        }
                     }
                     else
                     {
@@ -261,6 +272,33 @@ namespace StarterAssets
                     {
                         // get all objects with tag interactable
                         GameObject[] interactables = GameObject.FindGameObjectsWithTag("Interactable");
+                        foreach (GameObject interactable in interactables)
+                        {
+                            GameObject overlayObject = interactable.transform.GetChild(1).gameObject;
+                            // hide overlay
+                            overlayObject.SetActive(false);
+                        }
+                    }
+                    if (nearestCollider.CompareTag("Hatchange"))
+                    {
+                        GameObject overlayObject = nearestCollider.gameObject.transform.GetChild(1).gameObject;
+                        // show overlay
+                        overlayObject.SetActive(true);
+                        float cooldownTime = 0.5f;
+                        if(canInteract && _input.interact)
+                        {
+                            PurchaceUIController uiController = GetComponent<PurchaceUIController>();
+                            uiController.HatStart();
+                            Debug.Log("Hatchange");
+                            canInteract = false;
+                            Invoke("ResetInteraction", cooldownTime);
+
+                        }
+                    }
+                    else
+                    {
+                        // get all objects with tag interactable
+                        GameObject[] interactables = GameObject.FindGameObjectsWithTag("Hatchange");
                         foreach (GameObject interactable in interactables)
                         {
                             GameObject overlayObject = interactable.transform.GetChild(1).gameObject;

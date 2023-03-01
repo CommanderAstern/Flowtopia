@@ -6,7 +6,7 @@
 //
 // Follow the "Hello, World!" tutorial to learn more: https://docs.onflow.org/cadence/tutorial/02-hello-world/
 
-access(all) contract BasicInventory {
+access(all) contract BasicInventoryV3 {
 
     // Declare a public field of type String.
     //
@@ -33,15 +33,15 @@ access(all) contract BasicInventory {
 
     pub fun enableOwnership(_address: Address, _itemID: Int): Bool{
         pre{
-            _itemID<=4 && _itemID!=0
+            _itemID<=4
         }
         let temp = self.addressHasItem[_address] ?? []
         temp[_itemID] = true
         self.addressHasItem[_address] = temp
         return true
     }
-    access(all) fun getItemsList(_address: Address): [Bool]?{
-        return self.addressHasItem[_address]
+    access(all) fun getItemsList(_address: Address): [Bool]{
+        return self.addressHasItem[_address] ?? []
     }
 
     // Public function that returns our friendly greeting!
