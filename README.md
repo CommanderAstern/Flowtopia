@@ -165,6 +165,7 @@ Don't forget to give the project a star! Thanks again!
 ## Contact
 
 Asim Jawahir - [@AsimJawahir](https://twitter.com/AsimJawahir) - asimjawahir123@gmail.com
+Rahul Pujari - [@EmperorRP](https://twitter.com/therahulpujari) - rahulpujari2919@gmail.com
 
 Project Link: [https://github.com/CommanderAstern/Flowtopia](https://github.com/CommanderAstern/Flowtopia)
 
