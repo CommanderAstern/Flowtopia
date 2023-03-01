@@ -23,9 +23,11 @@ public class HatController : NetworkBehaviour
     void OnCurrentHatIndexChanged(int oldValue, int newValue)
     {
         // Deactivate the old hat and activate the new one
-        hats[currentHatIndex].SetActive(false);
+        for (int i = 0; i < hats.Length; i++)
+        {
+            hats[i].SetActive(i == newValue);
+        }
         currentHatIndex = newValue;
-        hats[currentHatIndex].SetActive(true);
     }
 
     void OnPublicVariableChanged(int oldValue, int newValue)

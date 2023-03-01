@@ -17,6 +17,7 @@ namespace Mirror
 
         public int offsetX;
         public int offsetY;
+        public GUIStyle buttonStyle;
 
         void Awake()
         {
@@ -28,11 +29,16 @@ namespace Mirror
             FlowSDK.Init(flowConfig);
             FlowSDK.RegisterWalletProvider(ScriptableObject.CreateInstance<DevWalletProvider>());
 
+
         }
 
         void OnGUI()
         {
-            GUILayout.BeginArea(new Rect(10 + offsetX, 40 + offsetY, 250, 9999));
+            buttonStyle = new GUIStyle(GUI.skin.button);
+            buttonStyle.fontSize = 20;
+            buttonStyle.fixedHeight = 60;
+            buttonStyle.fixedWidth = 200;
+            GUILayout.BeginArea(new Rect(10 + offsetX, 40 + offsetY, 700, 9999));
             if (!NetworkClient.isConnected && !NetworkServer.active)
             {
                 StartButtons();
@@ -45,7 +51,7 @@ namespace Mirror
             // client ready
             if (NetworkClient.isConnected && !NetworkClient.ready)
             {
-                if (GUILayout.Button("Client Ready"))
+                if (GUILayout.Button("Client Ready",buttonStyle))
                 {
                     NetworkClient.Ready();
                     if (NetworkClient.localPlayer == null)
@@ -67,7 +73,7 @@ namespace Mirror
                 // Server + Client
                 if (Application.platform != RuntimePlatform.WebGLPlayer)
                 {
-                    if (GUILayout.Button("Host (Server + Client)"))
+                    if (GUILayout.Button("Host (Server + Client)",buttonStyle))
                     {
                         FlowSDK.GetWalletProvider().Authenticate("", (string authAccount) =>
                         {
@@ -82,7 +88,7 @@ namespace Mirror
 
                 // Client + IP
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Client"))
+                if (GUILayout.Button("Client",buttonStyle))
                 {
                     FlowSDK.GetWalletProvider().Authenticate("", (string authAccount) =>
                     {
@@ -106,14 +112,14 @@ namespace Mirror
                 }
                 else
                 {
-                    if (GUILayout.Button("Server Only")) manager.StartServer();
+                    if (GUILayout.Button("Server Only",buttonStyle)) manager.StartServer();
                 }
             }
             else
             {
                 // Connecting
                 GUILayout.Label($"Connecting to {manager.networkAddress}..");
-                if (GUILayout.Button("Cancel Connection Attempt"))
+                if (GUILayout.Button("Cancel Connection Attempt",buttonStyle))
                 {
                     manager.StopClient();
                 }
@@ -148,11 +154,11 @@ namespace Mirror
             if (NetworkServer.active && NetworkClient.isConnected)
             {
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Stop Host"))
+                if (GUILayout.Button("Stop Host",buttonStyle))
                 {
                     manager.StopHost();
                 }
-                if (GUILayout.Button("Stop Client"))
+                if (GUILayout.Button("Stop Client",buttonStyle))
                 {
                     manager.StopClient();
                 }
@@ -161,7 +167,7 @@ namespace Mirror
             // stop client if client-only
             else if (NetworkClient.isConnected)
             {
-                if (GUILayout.Button("Stop Client"))
+                if (GUILayout.Button("Stop Client",buttonStyle))
                 {
                     manager.StopClient();
                 }
@@ -169,7 +175,7 @@ namespace Mirror
             // stop server if server-only
             else if (NetworkServer.active)
             {
-                if (GUILayout.Button("Stop Server"))
+                if (GUILayout.Button("Stop Server",buttonStyle))
                 {
                     manager.StopServer();
                 }
